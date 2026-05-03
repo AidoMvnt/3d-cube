@@ -133,6 +133,34 @@
             border-color: rgba(100, 200, 255, 0.5);
         }
 
+        .mode-switch {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-switch button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .mode-switch button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .mode-switch button.active {
+            background: rgba(100, 200, 255, 0.3);
+            border-color: rgba(100, 200, 255, 0.5);
+        }
+
         .info {
             color: rgba(255, 255, 255, 0.6);
             font-size: 0.8rem;
@@ -165,10 +193,15 @@
         <div class="controls-panel">
             <h2>🎨 Paletka Farieb</h2>
 
+            <div class="mode-switch">
+                <button class="btn active" id="modeFace">Face</button>
+                <button class="btn" id="modeEdge">Edge</button>
+            </div>
+
             <div class="control-group">
-                <label for="cubeColor">Farba kocky:</label>
-                <input type="color" id="cubeColor" class="color-picker" value="#6366f1">
-                <div class="preset-colors" id="cubeColorPresets">
+                <label for="colorPicker">Farba <span id="colorLabel">kocky:</span></label>
+                <input type="color" id="colorPicker" class="color-picker" value="#6366f1">
+                <div class="preset-colors" id="presetColorPresets">
                     <div class="preset-color" style="background: #6366f1;" data-color="#6366f1"></div>
                     <div class="preset-color" style="background: #ec4899;" data-color="#ec4899"></div>
                     <div class="preset-color" style="background: #10b981;" data-color="#10b981"></div>
@@ -180,27 +213,9 @@
                 </div>
             </div>
 
-            <div class="control-group">
-                <label for="edgeColor">Farba hrán:</label>
-                <input type="color" id="edgeColor" class="color-picker" value="#ffffff">
-                <div class="preset-colors" id="edgeColorPresets">
-                    <div class="preset-color" style="background: #ffffff;" data-color="#ffffff"></div>
-                    <div class="preset-color" style="background: #000000;" data-color="#000000"></div>
-                    <div class="preset-color" style="background: #ec4899;" data-color="#ec4899"></div>
-                    <div class="preset-color" style="background: #10b981;" data-color="#10b981"></div>
-                    <div class="preset-color" style="background: #f59e0b;" data-color="#f59e0b"></div>
-                    <div class="preset-color" style="background: #ef4444;" data-color="#ef4444"></div>
-                    <div class="preset-color" style="background: #3b82f6;" data-color="#3b82f6"></div>
-                    <div class="preset-color" style="background: #8b5cf6;" data-color="#8b5cf6"></div>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label>Rotácia:</label>
-                <div class="rotation-controls">
-                    <button class="btn" id="toggleRotation">⏸️ Pozastaviť</button>
-                    <button class="btn" id="resetRotation">🔄 Resetovať pozíciu</button>
-                </div>
+            <div class="rotation-controls">
+                <button class="btn" id="toggleRotation">⏸️ Pozastaviť</button>
+                <button class="btn" id="resetRotation">🔄 Resetovať pozíciu</button>
             </div>
 
             <div class="info">
