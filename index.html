@@ -51,6 +51,34 @@
             text-align: center;
         }
 
+        .mode-switch {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-switch button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .mode-switch button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .mode-switch button.active {
+            background: rgba(100, 200, 255, 0.3);
+            border-color: rgba(100, 200, 255, 0.5);
+        }
+
         .control-group {
             margin-bottom: 25px;
         }
@@ -129,34 +157,6 @@
         }
 
         .btn.active {
-            background: rgba(100, 200, 255, 0.3);
-            border-color: rgba(100, 200, 255, 0.5);
-        }
-
-        .mode-switch {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .mode-switch button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .mode-switch button:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .mode-switch button.active {
             background: rgba(100, 200, 255, 0.3);
             border-color: rgba(100, 200, 255, 0.5);
         }
@@ -272,9 +272,10 @@
 
         camera.position.z = 5;
 
-        // Rotation state
+        // State
         let isRotating = true;
         let autoRotateSpeed = 0.01;
+        let currentMode = 'face';
 
         // Mouse interaction
         let isDragging = false;
@@ -327,41 +328,50 @@
             isDragging = false;
         });
 
-        // Color picker events
-        const cubeColorInput = document.getElementById('cubeColor');
-        const edgeColorInput = document.getElementById('edgeColor');
+        // Mode switch
+        const modeFaceBtn = document.getElementById('modeFace');
+        const modeEdgeBtn = document.getElementById('modeEdge');
+        const colorLabel = document.getElementById('colorLabel');
+        const colorPicker = document.getElementById('colorPicker');
 
-        cubeColorInput.addEventListener('input', (e) => {
-            const color = e.target.value;
-            cubeMaterial.color.set(color);
+        modeFaceBtn.addEventListener('click', () => {
+            currentMode = 'face';
+            modeFaceBtn.classList.add('active');
+            modeEdgeBtn.classList.remove('active');
+            colorLabel.textContent = 'kocky:';
         });
 
-        edgeColorInput.addEventListener('input', (e) => {
+        modeEdgeBtn.addEventListener('click', () => {
+            currentMode = 'edge';
+            modeEdgeBtn.classList.add('active');
+            modeFaceBtn.classList.remove('active');
+            colorLabel.textContent = 'hrán:';
+        });
+
+        colorPicker.addEventListener('input', (e) => {
             const color = e.target.value;
-            edgeMaterial.color.set(color);
+            if (currentMode === 'face') {
+                cubeMaterial.color.set(color);
+            } else {
+                edgeMaterial.color.set(color);
+            }
         });
 
         // Preset colors
-        document.querySelectorAll('#cubeColorPresets .preset-color').forEach(preset => {
+        const presetColorPresets = document.getElementById('presetColorPresets');
+
+        presetColorPresets.querySelectorAll('.preset-color').forEach(preset => {
             preset.addEventListener('click', () => {
                 const color = preset.dataset.color;
-                cubeColorInput.value = color;
-                cubeMaterial.color.set(color);
+                colorPicker.value = color;
 
-                // Update active state
-                document.querySelectorAll('#cubeColorPresets .preset-color').forEach(p => p.classList.remove('active'));
-                preset.classList.add('active');
-            });
-        });
+                if (currentMode === 'face') {
+                    cubeMaterial.color.set(color);
+                } else {
+                    edgeMaterial.color.set(color);
+                }
 
-        document.querySelectorAll('#edgeColorPresets .preset-color').forEach(preset => {
-            preset.addEventListener('click', () => {
-                const color = preset.dataset.color;
-                edgeColorInput.value = color;
-                edgeMaterial.color.set(color);
-
-                // Update active state
-                document.querySelectorAll('#edgeColorPresets .preset-color').forEach(p => p.classList.remove('active'));
+                presetColorPresets.querySelectorAll('.preset-color').forEach(p => p.classList.remove('active'));
                 preset.classList.add('active');
             });
         });
