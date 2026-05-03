@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Kocka</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls-panel {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .controls-panel h2 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group label {
+            display: block;
+            color: #fff;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .color-picker {
+            width: 100%;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .color-picker::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-picker::-webkit-color-swatch {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+        }
+
+        .preset-colors {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .preset-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .preset-color:hover {
+            transform: scale(1.1);
+            border-color: #fff;
+        }
+
+        .preset-color.active {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .rotation-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn.active {
+            background: rgba(100, 200, 255, 0.3);
+            border-color: rgba(100, 200, 255, 0.5);
+        }
+
+        .info {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .controls-panel {
+                width: 100%;
+                height: 40%;
+                border-left: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="controls-panel">
+            <h2>🎨 Paletka Farieb</h2>
+
+            <div class="control-group">
+                <label for="cubeColor">Farba kocky:</label>
+                <input type="color" id="cubeColor" class="color-picker" value="#6366f1">
+                <div class="preset-colors" id="cubeColorPresets">
+                    <div class="preset-color" style="background: #6366f1;" data-color="#6366f1"></div>
+                    <div class="preset-color" style="background: #ec4899;" data-color="#ec4899"></div>
+                    <div class="preset-color" style="background: #10b981;" data-color="#10b981"></div>
+                    <div class="preset-color" style="background: #f59e0b;" data-color="#f59e0b"></div>
+                    <div class="preset-color" style="background: #ef4444;" data-color="#ef4444"></div>
+                    <div class="preset-color" style="background: #3b82f6;" data-color="#3b82f6"></div>
+                    <div class="preset-color" style="background: #8b5cf6;" data-color="#8b5cf6"></div>
+                    <div class="preset-color" style="background: #ffffff;" data-color="#ffffff"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="edgeColor">Farba hrán:</label>
+                <input type="color" id="edgeColor" class="color-picker" value="#ffffff">
+                <div class="preset-colors" id="edgeColorPresets">
+                    <div class="preset-color" style="background: #ffffff;" data-color="#ffffff"></div>
+                    <div class="preset-color" style="background: #000000;" data-color="#000000"></div>
+                    <div class="preset-color" style="background: #ec4899;" data-color="#ec4899"></div>
+                    <div class="preset-color" style="background: #10b981;" data-color="#10b981"></div>
+                    <div class="preset-color" style="background: #f59e0b;" data-color="#f59e0b"></div>
+                    <div class="preset-color" style="background: #ef4444;" data-color="#ef4444"></div>
+                    <div class="preset-color" style="background: #3b82f6;" data-color="#3b82f6"></div>
+                    <div class="preset-color" style="background: #8b5cf6;" data-color="#8b5cf6"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Rotácia:</label>
+                <div class="rotation-controls">
+                    <button class="btn" id="toggleRotation">⏸️ Pozastaviť</button>
+                    <button class="btn" id="resetRotation">🔄 Resetovať pozíciu</button>
+                </div>
+            </div>
+
+            <div class="info">
+                🖱️ Klikni a ťahaj pre rotáciu kocky<br>
+                📱 Responsive design
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({
+            canvas: document.getElementById('canvas'),
+            antialias: true
+        });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Create cube with materials
+        const cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
+
+        // Materials with initial colors
+        const cubeMaterial = new THREE.MeshPhongMaterial({
+            color: 0x6366f1,
+            shininess: 100
+        });
+
+        const edges = new THREE.EdgesGeometry(cubeGeometry);
+        const edgeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+
+        const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+
+        const cubeGroup = new THREE.Group();
+        cubeGroup.add(cube);
+        cubeGroup.add(edgeLines);
+        scene.add(cubeGroup);
+
+        // Add ambient light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        // Add directional light
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+        directionalLight2.position.set(-5, -5, -5);
+        scene.add(directionalLight2);
+
+        camera.position.z = 5;
+
+        // Rotation state
+        let isRotating = true;
+        let autoRotateSpeed = 0.01;
+
+        // Mouse interaction
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        document.getElementById('canvas').addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaMove = {
+                    x: e.clientX - previousMousePosition.x,
+                    y: e.clientY - previousMousePosition.y
+                };
+
+                cubeGroup.rotation.y += deltaMove.x * 0.01;
+                cubeGroup.rotation.x += deltaMove.y * 0.01;
+
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Touch support
+        document.getElementById('canvas').addEventListener('touchstart', (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                const deltaMove = {
+                    x: e.touches[0].clientX - previousMousePosition.x,
+                    y: e.touches[0].clientY - previousMousePosition.y
+                };
+
+                cubeGroup.rotation.y += deltaMove.x * 0.01;
+                cubeGroup.rotation.x += deltaMove.y * 0.01;
+
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // Color picker events
+        const cubeColorInput = document.getElementById('cubeColor');
+        const edgeColorInput = document.getElementById('edgeColor');
+
+        cubeColorInput.addEventListener('input', (e) => {
+            const color = e.target.value;
+            cubeMaterial.color.set(color);
+        });
+
+        edgeColorInput.addEventListener('input', (e) => {
+            const color = e.target.value;
+            edgeMaterial.color.set(color);
+        });
+
+        // Preset colors
+        document.querySelectorAll('#cubeColorPresets .preset-color').forEach(preset => {
+            preset.addEventListener('click', () => {
+                const color = preset.dataset.color;
+                cubeColorInput.value = color;
+                cubeMaterial.color.set(color);
+
+                // Update active state
+                document.querySelectorAll('#cubeColorPresets .preset-color').forEach(p => p.classList.remove('active'));
+                preset.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('#edgeColorPresets .preset-color').forEach(preset => {
+            preset.addEventListener('click', () => {
+                const color = preset.dataset.color;
+                edgeColorInput.value = color;
+                edgeMaterial.color.set(color);
+
+                // Update active state
+                document.querySelectorAll('#edgeColorPresets .preset-color').forEach(p => p.classList.remove('active'));
+                preset.classList.add('active');
+            });
+        });
+
+        // Rotation controls
+        document.getElementById('toggleRotation').addEventListener('click', function() {
+            isRotating = !isRotating;
+            this.textContent = isRotating ? '⏸️ Pozastaviť' : '▶️ Spustiť';
+            this.classList.toggle('active');
+        });
+
+        document.getElementById('resetRotation').addEventListener('click', () => {
+            cubeGroup.rotation.set(0, 0, 0);
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (isRotating && !isDragging) {
+                cubeGroup.rotation.x += autoRotateSpeed;
+                cubeGroup.rotation.y += autoRotateSpeed;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
