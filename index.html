@@ -20,6 +20,7 @@
 
         .container {
             display: flex;
+            flex-direction: column;
             height: 100vh;
             width: 100vw;
         }
@@ -27,6 +28,7 @@
         .canvas-container {
             flex: 1;
             position: relative;
+            min-height: 60%;
         }
 
         #canvas {
@@ -36,12 +38,13 @@
         }
 
         .controls-panel {
-            width: 280px;
+            width: 100%;
+            height: 40%;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             padding: 20px;
             overflow-y: auto;
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .controls-panel h2 {
@@ -177,7 +180,7 @@
 
             .controls-panel {
                 width: 100%;
-                height: 40%;
+                height: 50%;
                 border-left: none;
                 border-top: 1px solid rgba(255, 255, 255, 0.2);
             }
@@ -190,9 +193,7 @@
             <canvas id="canvas"></canvas>
         </div>
 
-        <div class="controls-panel">
-            <h1 style="text-align:center;color:white;font-size:1.5rem;margin-bottom:30px;">som kocka</h1>
-            <h2>🎨 Paletka Farieb</h2>
+            <h1 style="text-align:center;color:white;font-size:1.5rem;margin-bottom:15px;">som kocka</h1>
 
             <div class="mode-switch">
                 <button class="btn active" id="modeFace">Face</button>
@@ -223,7 +224,6 @@
                 🖱️ Klikni a ťahaj pre rotáciu kocky<br>
                 📱 Responsive design
             </div>
-        </div>
     </div>
 
     <script>
